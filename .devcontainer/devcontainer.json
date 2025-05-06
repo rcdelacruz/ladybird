@@ -6,10 +6,7 @@
     },
     "runArgs": [
         "--cap-add=SYS_PTRACE",
-        "--security-opt", "seccomp=unconfined",
-        "--privileged",
-        "--device=/dev/dri:/dev/dri", 
-        "--net=host"
+        "--security-opt", "seccomp=unconfined"
     ],
     "customizations": {
         "vscode": {
@@ -17,25 +14,15 @@
                 "ms-vscode.cpptools",
                 "ms-vscode.cmake-tools",
                 "twxs.cmake",
-                "ms-vscode.makefile-tools",
                 "xaver.clang-format"
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
-                "cmake.configureOnOpen": true,
-                "editor.formatOnSave": true,
-                "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+                "cmake.configureOnOpen": true
             }
         }
     },
-    "mounts": [
-        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
-    ],
     "forwardPorts": [],
     "postCreateCommand": "chmod +x ./.devcontainer/post-create.sh && bash ./.devcontainer/post-create.sh",
-    "remoteUser": "vscode",
-    "hostRequirements": {
-        "memory": "8gb",
-        "cpus": 4
-    }
+    "remoteUser": "vscode"
 }
