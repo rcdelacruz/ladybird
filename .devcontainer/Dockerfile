@@ -4,66 +4,23 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# Set non-interactive frontend for apt
+# Set non-interactive frontend for apt and prevent errors
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
 
-# Install necessary dependencies
-RUN apt-get update && apt-get -y install --no-install-recommends \
+# Update and install essential packages first
+RUN apt-get update && apt-get install -y \
     build-essential \
+    cmake \
     ninja-build \
-    libstdc++-12-dev \
-    clang \
-    lld \
-    nasm \
-    rsync \
-    texinfo \
-    gcc-multilib \
-    g++-multilib \
-    python3 \
-    qemu-system-i386 \
-    qemu-utils \
-    ccache \
     git \
     curl \
     wget \
-    gperf \
-    bison \
-    flex \
-    libmpfr-dev \
-    libmpc-dev \
-    libgmp-dev \
-    e2fsprogs \
-    mtools \
     pkg-config \
-    libfreetype6-dev \
-    libfontconfig1-dev \
-    libicu-dev \
-    libssl-dev \
-    libsqlite3-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libgif-dev \
-    libxcb1-dev \
-    libx11-dev \
-    libxext-dev \
-    libxft-dev \
-    libxinerama-dev \
-    libxcursor-dev \
-    libxrender-dev \
-    libxfixes-dev \
-    libxcb-keysyms1-dev \
-    libxcb-render0-dev \
-    libxcb-util-dev \
-    libxcb-image0-dev \
-    libxcb-icccm4-dev \
-    libglu1-mesa-dev \
-    libnss3-dev \
-    libsoup2.4-dev \
-    libharfbuzz-dev \
     sudo \
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install a newer version of CMake (3.27.7)
+# Install CMake 3.27.7 (modern version)
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.7/cmake-3.27.7-linux-x86_64.sh \
     -q -O /tmp/cmake-install.sh \
     && chmod u+x /tmp/cmake-install.sh \
@@ -74,6 +31,32 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.7/cmake-3.27.7
 
 # Verify CMake version
 RUN cmake --version
+
+# Install development dependencies in smaller, more manageable groups
+RUN apt-get update && apt-get install -y \
+    clang \
+    lld \
+    python3 \
+    gperf \
+    bison \
+    flex \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    libicu-dev \
+    libfreetype6-dev \
+    libfontconfig1-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    libx11-dev \
+    libxext-dev \
+    libxft-dev \
+    libxcursor-dev \
+    libxrender-dev \
+    libxfixes-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user with sudo access
 RUN groupadd --gid $USER_GID $USERNAME \
