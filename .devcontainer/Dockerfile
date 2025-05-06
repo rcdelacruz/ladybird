@@ -10,7 +10,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install necessary dependencies
 RUN apt-get update && apt-get -y install --no-install-recommends \
     build-essential \
-    cmake \
     ninja-build \
     libstdc++-12-dev \
     clang \
@@ -63,6 +62,18 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
     libharfbuzz-dev \
     sudo \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+# Install a newer version of CMake (3.27.7)
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.7/cmake-3.27.7-linux-x86_64.sh \
+    -q -O /tmp/cmake-install.sh \
+    && chmod u+x /tmp/cmake-install.sh \
+    && mkdir -p /opt/cmake \
+    && /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake \
+    && ln -s /opt/cmake/bin/* /usr/local/bin/ \
+    && rm /tmp/cmake-install.sh
+
+# Verify CMake version
+RUN cmake --version
 
 # Create a non-root user with sudo access
 RUN groupadd --gid $USER_GID $USERNAME \
